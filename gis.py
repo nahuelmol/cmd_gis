@@ -8,13 +8,18 @@ def switch(cmd):
     if cmd.h == True:
         msg = 'helping'
     if cmd.rootCommand == 'map':
+        MAP = Map(cmd.targetType)
         if cmd.targetType == 'base':
-            MAP = Map(cmd.targetType)
-            MAP.start()
+            MAP.base()
             msg = 'map base'
+        elif cmd.targetType == 'complete':
+            MAP.base()
+            MAP.with_stats()
+            msg = 'map complete'
         else:
             msg = 'not recognized target type'
             return False, msg
+        MAP.save()
     msg = '----PROCESS:DONE----{}'.format(msg)
     return True, msg
 

@@ -8,8 +8,6 @@ from src.scrap import extract
 
 class Map:
     def __init__(self, maptype):
-        if maptype == 'base':
-            print('building base map')
         self.bbox = extract('box')
         #bbox = (-68.77, -31.05, -68.74, -31.01)
         #bbox = (-68.77, -31.03, -68.745, -31.01) contexto proximo
@@ -30,8 +28,9 @@ class Map:
         self.tile_size = 256
         self.r = 5
         self.img = {}
+        self.map_img = None
 
-    def start(self):
+    def base(self):
         for t in self.tiles:
             url = self.tile_url.format(z=t.z, x=t.x, y=t.y)
             r   = requests.get(url)
@@ -44,14 +43,15 @@ class Map:
         min_y, max_y = min(self.ys), max(self.ys)
         width = (max_x - min_x + 1) * self.tile_size
         height= (max_y - min_y + 1) * self.tile_size
-        map_img = Image.new("RGB", (width, height))
+        self.map_img = Image.new("RGB", (width, height))
 
+    def with_stats(self):
         for (x, y), img in self.images.items():
             px = (x - min_x) * self.tile_size
             py = (y - min_y) * self.tile_size
-            map_img.paste(img, (px, py))
+            self.map_img.paste(img, (px, py))
 
-        draw = ImageDraw.Draw(map_img)
+        draw = ImageDraw.Draw(self.map_img)
         with open(self.csv_file, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -65,12 +65,16 @@ class Map:
                 x_img = (tile.x - min_x) * self.tile_size + px
                 y_img = (tile.y - min_y) * self.tile_size + py
                 draw.ellipse(
-                    (x_img - self.r, y_img - self.r, x_img + self.r, y_img + self.r),
+                    (x_img - self.r, 
+                     y_img - self.r, 
+                     x_img + self.r, 
+                     y_img + self.r),
                     fill="red",
                     outline="black")
 
-        map_img.save("satelital_image.png")
-        print("Image saved: satelital_image.png")
+    def save(self):
+        self.map_img.save("finished.png")
+        print("Image saved: finished.png")
 
 if __name__ == "__main__":
     command = None
