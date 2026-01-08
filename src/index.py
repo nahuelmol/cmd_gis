@@ -16,10 +16,15 @@ class Map:
         #default values
         self.zoom = 17
         self.csv_file = "Grid"
-        self.tile_url = (
-                "https://services.arcgisonline.com/ArcGis/rest/services/"
-                "World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        )
+        SERVICES = [
+            "https://services.arcgisonline.com/ArcGis/rest/services/"
+            "World_Imagery/MapServer/tile/{z}/{y}/{x}",
+
+            "https://api.mapbox.com/styles/v1/{username}/{style_id}/static/"
+            "{overlay}/{lon},{lat},{zoom},{bearing},{pitch}|{bbox}|{auto}/{width}x{height}?{access_token}"
+        ]
+        self.service = "ARCGIS"
+        self.tile_url = SERVICES[0]
         self.tiles = list(mercantile.tiles(*self.bbox, self.zoom))
         print("Tiles to download:", len(self.tiles))
         self.images = {}
@@ -27,13 +32,31 @@ class Map:
         self.ys  = []
         self.tile_size = 256
         self.r = 5
-        self.img = {}
+        self.img = None
         self.map_img = None
 
     def base(self):
         for t in self.tiles:
-            url = self.tile_url.format(z=t.z, x=t.x, y=t.y)
-            r   = requests.get(url)
+            if self.service == "ARCGIS":
+                self.url = self.tile_url.format(z=t.z, x=t.x, y=t.y)
+            elif self.service == "MAPBOX":
+                self.url = self.tile_url.format( username=self.username,
+                                            style_id="satellite-v9",
+                                            overlay=0,
+                                            lon=0,
+                                            lat=0,
+                                            zoom=self.zoom,
+                                            bearing=0,
+                                            pitch=0,
+                                            bbox=self.bbox,
+                                            auto=0,
+                                            width=400,
+                                            height=400)
+            else:
+                return False, 'not recognized service'
+
+            #headers = {"User-Agent":"Mozilla/5.0"}
+            r   = requests.get(self.url)
             img = Image.open(BytesIO(r.content))
             self.images[(t.x, t.y)] = img
             self.xs.append(t.x)
@@ -45,12 +68,12 @@ class Map:
         height= (max_y - min_y + 1) * self.tile_size
         self.map_img = Image.new("RGB", (width, height))
 
-    def with_stats(self):
         for (x, y), img in self.images.items():
             px = (x - min_x) * self.tile_size
             py = (y - min_y) * self.tile_size
             self.map_img.paste(img, (px, py))
 
+    def with_stats(self):
         draw = ImageDraw.Draw(self.map_img)
         with open(self.csv_file, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)

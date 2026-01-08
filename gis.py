@@ -17,7 +17,7 @@ def switch(cmd):
             MAP.with_stats()
             msg = 'map complete'
         else:
-            msg = 'not recognized target type'
+            msg = 'not recognized map type'
             return False, msg
         MAP.save()
     msg = '----PROCESS:DONE----{}'.format(msg)
