@@ -1,0 +1,7 @@
+myenv
+src/__pycache__/*.pyc
+
+*.png
+*.csv
+*.dat
+Grid

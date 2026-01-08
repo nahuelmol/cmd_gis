@@ -14,8 +14,11 @@ def switch(cmd):
             msg = 'map base'
         elif cmd.targetType == 'complete':
             MAP.base()
-            MAP.with_stats()
+            MAP.add_stats()
             msg = 'map complete'
+        elif cmd.targetType == 'add':
+            MAP.add_point()
+            msg = 'add point'
         else:
             msg = 'not recognized map type'
             return False, msg
