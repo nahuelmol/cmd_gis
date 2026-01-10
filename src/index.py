@@ -10,9 +10,9 @@ from src.scrap import extract
 class Map:
     def __init__(self, maptype):
         self.bbox = extract('box')
-        #bbox = (-68.77, -31.05, -68.74, -31.01)
-        #bbox = (-68.77, -31.03, -68.745, -31.01) contexto proximo
-        #bbox = (-68.75, -31.027, -68.745, -31.019) solo talacasto
+        #bbox = (-68.765, -31.05, -68.74, -31.01) contexto con sierra
+        #bbox = (-68.77, -31.03, -68.74, -31.01) 
+        #bbox = (-68.75, -31.027, -68.745, -31.01) baños 
         
         #default values
         self.zoom = 17
@@ -43,6 +43,7 @@ class Map:
 
         self.px = None
         self.py = None
+        self.mapname = ''
 
     def base(self):
         for t in self.tiles:
@@ -81,50 +82,29 @@ class Map:
             self.px = (x - self.min_x) * self.tile_size
             self.py = (y - self.min_y) * self.tile_size
             self.map_img.paste(img, (self.px, self.py))
-        self.mapename = "base.png"
-
-    def add_stats(self):
-        draw = ImageDraw.Draw(self.map_img)
-        with open(self.csv_file, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                lat = float(row["lat"])
-                lon = float(row["lon"])
-                tile= mercantile.tile(lon, lat, self.zoom)
-                x_frac, y_frac = mercantile.xy(lon, lat)
-                left, bottom, right, top = mercantile.xy_bounds(tile)
-                px  = int((x_frac - left) / (right - left) * self.tile_size)
-                py  = int((top - y_frac) / (top - bottom) * self.tile_size)
-                x_img = (tile.x - self.min_x) * self.tile_size + px
-                y_img = (tile.y - self.min_y) * self.tile_size + py
-                draw.ellipse(
-                    (x_img - self.r, 
-                     y_img - self.r, 
-                     x_img + self.r, 
-                     y_img + self.r),
-                    fill="red",
-                    outline="black")
-        self.mapname = "map_with_stats.png"
+        self.mapname = "base.png"
 
     def add_point(self):
         lon_min, lat_min, lon_max, lat_max = extract('box')
         lat_origin = lat_max
         lon_origin = lon_min
-        self.map_img    = Image.open("finished.png").convert("RGB")
+        self.map_img    = Image.open("base.png").convert("RGB")
         draw            = ImageDraw.Draw(self.map_img)
         width, height   = self.map_img.size
         lat_width = lat_max-lat_min
         lon_width = lon_max-lon_min
 
+        print('size -> {} - {}'.format(width, height))
+        print('geog -> {} - {}'.format(lon_width, lat_width))
+
         data = pd.read_csv(self.csv_file)
         for row in data.itertuples(index=False):
-            lon_d = abs(row[0]- lon_origin)
-            lat_d = abs(row[1]- lat_origin)
+            lon_d = abs(row[0]) - abs(lon_origin)
+            lat_d = abs(row[1]) - abs(lat_origin)
             #3's rule
-            x = (width / lat_width) * lat_d
-            y = (height / lon_width) * lon_d
+            y = (height/ lat_width) * abs(lat_d)
+            x = (width / lon_width) * abs(lon_d)
 
-            print("{} - {}".format(x, y))
             draw.ellipse(
                 (x - 10, 
                  y - 10, 
@@ -132,11 +112,11 @@ class Map:
                  y + 10),
                 fill="red",
                 outline="black")
-        self.mapname = 'map_with_points'
+        self.mapname = 'map_with_points.png'
 
     def save(self):
         self.map_img.save(self.mapname)
-        print("Image saved: {}.png".format(self.mapname))
+        print("Image saved: {}".format(self.mapname))
 
 if __name__ == "__main__":
     command = None
