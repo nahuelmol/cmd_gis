@@ -15,6 +15,9 @@ def switch(cmd):
         elif cmd.targetType == 'add':
             MAP.add_point()
             msg = 'add point'
+        elif cmd.targetType == 'sh':
+            MAP.sheet()
+            msg = 'add sheet'
         else:
             msg = 'not recognized map type'
             return False, msg

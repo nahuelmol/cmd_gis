@@ -114,6 +114,29 @@ class Map:
                 outline="black")
         self.mapname = 'map_with_points.png'
 
+    def sheet(self):
+        lon_min, lat_min, lon_max, lat_max = extract('box')
+        #inlat = 0.004
+        #inlon = 0.004
+        lat_origin = lat_max
+        lon_origin = lon_min
+        self.map_img    = Image.open("base.png").convert("RGB")
+        draw            = ImageDraw.Draw(self.map_img)
+        width, height   = self.map_img.size
+        nlines = 3
+        stepx = width / (nlines+1)
+        stepy = height/ (nlines+1)
+        acx = 0
+        acy = 0
+        for i in range(nlines):
+            acx = acx + stepx
+            acy = acy + stepy
+            xline = (acx, 0, acx, height)
+            yline = (0, acy, width, acy)
+            draw.line(xline, fill="black", width=2)
+            draw.line(yline, fill="black", width=2)
+        self.mapname = 'map_with_sheet.png'
+
     def save(self):
         self.map_img.save(self.mapname)
         print("Image saved: {}".format(self.mapname))
