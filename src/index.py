@@ -1,7 +1,7 @@
 import csv
 import mercantile
 import requests
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 import pandas as pd
 
@@ -27,7 +27,6 @@ class Map:
         self.service = "ARCGIS"
         self.tile_url = SERVICES[0]
         self.tiles = list(mercantile.tiles(*self.bbox, self.zoom))
-        print("Tiles to download:", len(self.tiles))
         self.images = {}
         self.xs  = []
         self.ys  = []
@@ -46,6 +45,7 @@ class Map:
         self.mapname = ''
 
     def base(self):
+        print("Tiles to download:", len(self.tiles))
         for t in self.tiles:
             if self.service == "ARCGIS":
                 self.url = self.tile_url.format(z=t.z, x=t.x, y=t.y)
@@ -84,7 +84,7 @@ class Map:
             self.map_img.paste(img, (self.px, self.py))
         self.mapname = "base.png"
 
-    def add_point(self):
+    def add_profiles(self):
         lon_min, lat_min, lon_max, lat_max = extract('box')
         lat_origin = lat_max
         lon_origin = lon_min
@@ -94,22 +94,33 @@ class Map:
         lat_width = lat_max-lat_min
         lon_width = lon_max-lon_min
 
-        print('size -> {} - {}'.format(width, height))
-        print('geog -> {} - {}'.format(lon_width, lat_width))
-
+        self.csv_file = "Profile 1"
         data = pd.read_csv(self.csv_file)
         for row in data.itertuples(index=False):
-            lon_d = abs(row[0]) - abs(lon_origin)
-            lat_d = abs(row[1]) - abs(lat_origin)
+            lon_d   = abs(row[4]) - abs(lon_origin)
+            lat_d   = abs(row[5]) - abs(lat_origin)
+            font    = ImageFont.load_default()
+            nst     = row[0]
+            tw, th  = font.getmask(str(nst)).size
+            offset  = 4
+            r = 6
             #3's rule
             y = (height/ lat_width) * abs(lat_d)
             x = (width / lon_width) * abs(lon_d)
 
+            text_x = x - tw // 2
+            text_y = y - r - th - offset
+            x1 = text_x-1
+            y1 = text_y-1
+            x2 = text_x+tw+2
+            y2 = text_y+th+2
+            draw.rectangle((x1, y1, x2, y2), fill="white", outline="white")
+            draw.text((text_x, text_y), str(nst), fill="black", font=font)
             draw.ellipse(
-                (x - 10, 
-                 y - 10, 
-                 x + 10, 
-                 y + 10),
+                (x - r, 
+                 y - r, 
+                 x + r, 
+                 y + r),
                 fill="red",
                 outline="black")
         self.mapname = 'map_with_points.png'

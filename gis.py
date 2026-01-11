@@ -12,8 +12,8 @@ def switch(cmd):
         if cmd.targetType == 'base':
             MAP.base()
             msg = 'map base'
-        elif cmd.targetType == 'add':
-            MAP.add_point()
+        elif cmd.targetType == 'prof':
+            MAP.add_profiles()
             msg = 'add point'
         elif cmd.targetType == 'sh':
             MAP.sheet()
