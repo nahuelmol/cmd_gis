@@ -18,6 +18,9 @@ def switch(cmd):
         elif cmd.targetType == 'sh':
             MAP.sheet()
             msg = 'add sheet'
+        elif cmd.targetType == 'zeb':
+            MAP.zebra()
+            msg = 'add sheet'
         else:
             msg = 'not recognized map type'
             return False, msg

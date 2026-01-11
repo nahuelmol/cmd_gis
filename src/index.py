@@ -137,6 +137,38 @@ class Map:
             draw.line(yline, fill="black", width=2)
         self.mapname = 'map_with_sheet.png'
 
+    def zebra(self):
+        lon_min, lat_min, lon_max, lat_max = extract('box')
+        #inlat = 0.004
+        #inlon = 0.004
+        lat_origin = lat_max
+        lon_origin = lon_min
+        self.map_img    = Image.open("base.png").convert("RGB")
+        draw            = ImageDraw.Draw(self.map_img)
+        width, height   = self.map_img.size
+        nlines = 4
+        stepx = width / (nlines)
+        stepy = height/ (nlines)
+        acx = 0
+        acy = 0
+        color = "black"
+        for i in range(nlines):
+            lineu  = (acx, 0, acx + stepx, 0)
+            lined  = (acx, height, acx + stepx, height)
+            linel  = (0, acy, 0, acy + stepy)
+            liner  = (width, acy, width, acy + stepy)
+            draw.line(lineu, fill=color, width=16)
+            draw.line(lined, fill=color, width=16)
+            draw.line(linel, fill=color, width=16)
+            draw.line(liner, fill=color, width=16)
+            if color == "black":
+                color = "white"
+            else:
+                color = "black"
+            acx = acx + stepx
+            acy = acy + stepy
+        self.mapname = 'map_with_zebra.png'
+
     def save(self):
         self.map_img.save(self.mapname)
         print("Image saved: {}".format(self.mapname))
