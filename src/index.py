@@ -16,7 +16,7 @@ class Map:
         
         #default values
         self.zoom = 17
-        self.csv_file = "locations.dat"
+        self.csv_file = "Grid"
         SERVICES = [
             "https://services.arcgisonline.com/ArcGis/rest/services/"
             "World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -94,7 +94,7 @@ class Map:
         lat_width = lat_max-lat_min
         lon_width = lon_max-lon_min
 
-        self.csv_file = "Profile 1"
+        self.csv_file = "Grid"
         data = pd.read_csv(self.csv_file)
         for row in data.itertuples(index=False):
             lon_d   = abs(row[4]) - abs(lon_origin)
