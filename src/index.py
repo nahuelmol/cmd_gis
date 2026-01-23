@@ -180,6 +180,68 @@ class Map:
             acy = acy + stepy
         self.mapname = 'map_with_zebra.png'
 
+    def legend(self):
+        imagename = "base"
+        self.map_img    = Image.open('{}.png'.format(imagename))
+        width, height   = self.map_img.size
+        draw = ImageDraw.Draw(self.map_img)
+
+        fontsize = 40
+        margin   = 40
+        location_fb = height - (fontsize + margin)
+        try:
+            font = ImageFont.truetype("arial.ttf", fontsize)
+        except IOError:
+            font = ImageFont.load_default() 
+            print("Specific font not found, using default font.")
+
+        text = "This is an exmaple legend!"
+        margin_x = 40
+        position = (margin_x, location_fb) 
+        text_color = (0, 0, 0)
+
+        background_color = "white"
+        left, top, right, bottom = draw.textbbox(position, text, font=font)
+        draw.rectangle((left, top, right, bottom), fill=background_color)
+        draw.text(position, text, fill=text_color, font=font)
+        self.mapname = '{}_with_legend.png'.format(imagename)
+
+    def scalebar(self):
+        imagname = "base"
+        lon_min, lat_min, lon_max, lat_max = extract('box')
+        self.map_img    = Image.open('{}.png'.format(imagname))
+        draw = ImageDraw.Draw(self.map_img)
+        width, height   = self.map_img.size
+        self.mapname = '{}_with_scalebar.png'.format(imagname)
+
+        fontsize = 40
+        text_margin = 10
+        try:
+            font = ImageFont.truetype("arial.ttf", fontsize)
+        except IOError:
+            font = ImageFont.load_default() 
+            print("Specific font not found, using default font.")
+
+        #100 = 0.0009
+        lond = abs(lon_max - lon_min)
+        px50 = 0.0009 * (width/lond)
+        xmargin = 20
+        white_l = width - ((px50*2) + xmargin)
+        white_r = width - (px50 + xmargin)
+        black_l = width - (px50 + xmargin)
+        black_r = width - xmargin
+        ymargin = 20
+        top = height - (20 + ymargin)
+        bottom = height - (ymargin)
+        draw.rectangle((white_l, top, white_r, bottom), fill="white")
+        draw.rectangle((black_l, top, black_r, bottom), fill="black")
+        font_loc = top - (fontsize + text_margin)
+        position = (black_l, font_loc) 
+        text = "100m"
+        left, top, right, bottom = draw.textbbox(position, text, font=font)
+        draw.text(position, text, fill="black", font=font)
+
+    
     def save(self):
         self.map_img.save(self.mapname)
         print("Image saved: {}".format(self.mapname))
@@ -192,9 +254,4 @@ if __name__ == "__main__":
         msg = 'please, be serious, type a valid command'
         sys.exit(msg)
     command.setCommand()
-    res, msg = command.setArgs()
-    if res == True:
-        print(msg)
-    res, msg = switch(command)
-    print(msg)
-
+    res, msg = command

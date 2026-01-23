@@ -21,6 +21,12 @@ def switch(cmd):
         elif cmd.targetType == 'zeb':
             MAP.zebra()
             msg = 'add sheet'
+        elif cmd.targetType == 'legend':
+            MAP.legend()
+            msg = 'add legend'
+        elif cmd.targetType == 'scale':
+            MAP.scalebar()
+            msg = 'add scale'
         else:
             msg = 'not recognized map type'
             return False, msg
