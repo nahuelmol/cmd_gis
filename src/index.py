@@ -84,11 +84,12 @@ class Map:
             self.map_img.paste(img, (self.px, self.py))
         self.mapname = "base.png"
 
-    def add_profiles(self):
+    def add_profiles(self, linked):
         lon_min, lat_min, lon_max, lat_max = extract('box')
         lat_origin = lat_max
         lon_origin = lon_min
-        self.map_img    = Image.open("base.png").convert("RGB")
+        if linked == False:
+            self.map_img    = Image.open("base.png").convert("RGB")
         draw            = ImageDraw.Draw(self.map_img)
         width, height   = self.map_img.size
         lat_width = lat_max-lat_min
@@ -125,13 +126,14 @@ class Map:
                 outline="black")
         self.mapname = 'map_with_points.png'
 
-    def sheet(self):
+    def sheet(self, linked):
         lon_min, lat_min, lon_max, lat_max = extract('box')
         #inlat = 0.004
         #inlon = 0.004
         lat_origin = lat_max
         lon_origin = lon_min
-        self.map_img    = Image.open("base.png").convert("RGB")
+        if linked == False:
+            self.map_img    = Image.open("base.png").convert("RGB")
         draw            = ImageDraw.Draw(self.map_img)
         width, height   = self.map_img.size
         nlines = 3
@@ -148,13 +150,14 @@ class Map:
             draw.line(yline, fill="black", width=2)
         self.mapname = 'map_with_sheet.png'
 
-    def zebra(self):
+    def zebra(self, linked):
         lon_min, lat_min, lon_max, lat_max = extract('box')
         #inlat = 0.004
         #inlon = 0.004
         lat_origin = lat_max
         lon_origin = lon_min
-        self.map_img    = Image.open("base.png").convert("RGB")
+        if linked == False:
+            self.map_img    = Image.open("base.png").convert("RGB")
         draw            = ImageDraw.Draw(self.map_img)
         width, height   = self.map_img.size
         nlines = 4
@@ -180,9 +183,10 @@ class Map:
             acy = acy + stepy
         self.mapname = 'map_with_zebra.png'
 
-    def legend(self):
+    def legend(self, linked):
         imagename = "base"
-        self.map_img    = Image.open('{}.png'.format(imagename))
+        if linked == False:
+            self.map_img    = Image.open('{}.png'.format(imagename))
         width, height   = self.map_img.size
         draw = ImageDraw.Draw(self.map_img)
 
@@ -206,10 +210,11 @@ class Map:
         draw.text(position, text, fill=text_color, font=font)
         self.mapname = '{}_with_legend.png'.format(imagename)
 
-    def scalebar(self):
+    def scalebar(self, linked):
         imagname = "base"
         lon_min, lat_min, lon_max, lat_max = extract('box')
-        self.map_img    = Image.open('{}.png'.format(imagname))
+        if linked == False:
+            self.map_img    = Image.open('{}.png'.format(imagname))
         draw = ImageDraw.Draw(self.map_img)
         width, height   = self.map_img.size
         self.mapname = '{}_with_scalebar.png'.format(imagname)
@@ -241,6 +246,13 @@ class Map:
         left, top, right, bottom = draw.textbbox(position, text, font=font)
         draw.text(position, text, fill="black", font=font)
 
+    def complete(self):
+        self.add_profiles(True)
+        self.sheet(True)
+        self.zebra(True)
+        self.legend(True)
+        self.scalebar(True)
+        self.mapname = "complete.png"
     
     def save(self):
         self.map_img.save(self.mapname)

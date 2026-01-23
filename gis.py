@@ -13,19 +13,22 @@ def switch(cmd):
             MAP.base()
             msg = 'map base'
         elif cmd.targetType == 'prof':
-            MAP.add_profiles()
+            MAP.add_profiles(False)
             msg = 'add point'
         elif cmd.targetType == 'sh':
-            MAP.sheet()
+            MAP.sheet(False)
             msg = 'add sheet'
         elif cmd.targetType == 'zeb':
-            MAP.zebra()
+            MAP.zebra(False)
             msg = 'add sheet'
         elif cmd.targetType == 'legend':
-            MAP.legend()
+            MAP.legend(False)
             msg = 'add legend'
         elif cmd.targetType == 'scale':
-            MAP.scalebar()
+            MAP.scalebar(False)
+            msg = 'add scale'
+        elif cmd.targetType == 'complete':
+            MAP.complete()
             msg = 'add scale'
         else:
             msg = 'not recognized map type'
