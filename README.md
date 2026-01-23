@@ -14,7 +14,9 @@ This is a python CMD GIS application oriented to map creation
 * labels
 * points
 * lines
+* scalebar
 
 It uses map styles from external map services like ARCgis API service.
+
 
 
