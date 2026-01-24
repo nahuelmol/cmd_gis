@@ -88,8 +88,7 @@ class Map:
         lon_min, lat_min, lon_max, lat_max = extract('box')
         lat_origin = lat_max
         lon_origin = lon_min
-        if linked == False:
-            self.map_img    = Image.open("base.png").convert("RGB")
+        self.map_img    = Image.open("base.png").convert("RGB")
         draw            = ImageDraw.Draw(self.map_img)
         width, height   = self.map_img.size
         lat_width = lat_max-lat_min
@@ -246,14 +245,26 @@ class Map:
         left, top, right, bottom = draw.textbbox(position, text, font=font)
         draw.text(position, text, fill="black", font=font)
 
-    def complete(self):
-        self.add_profiles(True)
-        self.sheet(True)
-        self.zebra(True)
-        self.legend(True)
-        self.scalebar(True)
-        self.mapname = "complete.png"
-    
+    def north(self, linked):
+        imgname = "base"
+        if linked == False:
+            self.map_img    = Image.open('{}.png'.format(imgname))
+        #draw = ImageDraw.Draw(self.map_img)
+        north = Image.open("norte.png").convert('RGBA')
+        h, w = north.size
+        new_h = h // 2
+        new_w = w // 2
+        north = north.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+        map_h, map_w = self.map_img.size
+        ymargin_n = 20
+        xmargin_n = 20
+        north_x = (map_w -(xmargin_n + new_w))
+        north_y = ymargin_n 
+        offset = (north_x, north_y)
+        self.map_img.paste(north, offset, north)
+        self.mapname = '{}_with_noth.png'.format(imgname)
+
     def save(self):
         self.map_img.save(self.mapname)
         print("Image saved: {}".format(self.mapname))

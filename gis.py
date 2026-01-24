@@ -27,8 +27,17 @@ def switch(cmd):
         elif cmd.targetType == 'scale':
             MAP.scalebar(False)
             msg = 'add scale'
+        elif cmd.targetType == 'north':
+            MAP.north(False)
+            msg = 'add north'
         elif cmd.targetType == 'complete':
-            MAP.complete()
+            MAP.add_profiles(True)
+            MAP.sheet(True)
+            MAP.zebra(True)
+            MAP.legend(True)
+            MAP.scalebar(True)
+            MAP.north(True)
+            MAP.mapname = "complete.png"
             msg = 'add scale'
         else:
             msg = 'not recognized map type'
